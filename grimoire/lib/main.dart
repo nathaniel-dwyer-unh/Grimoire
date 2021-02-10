@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import './navigation.dart';
+import 'package:grimoire/searchMtgjson.dart';
+import './searchMtgjson.dart';
+import './retrieveMtgjson.dart';
 
 void main() {
   runApp(GrimoireApp());
@@ -15,12 +17,13 @@ class _GrimoireAppState extends State<GrimoireApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Grimoire App'),
-          centerTitle: true,
-        ),
-        body: Navigation(),
-      ),
+          appBar: AppBar(
+            title: Text('Grimoire App'),
+            centerTitle: true,
+          ),
+          body: Column(
+            children: [SearchMtgjson(), RetrieveMtgjson()],
+          )),
       theme: ThemeData(primaryColor: Colors.purple),
     );
   }
