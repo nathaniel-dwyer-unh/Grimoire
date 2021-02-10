@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class SearchMtgjson extends StatelessWidget {
+class SearchCardDatabase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
