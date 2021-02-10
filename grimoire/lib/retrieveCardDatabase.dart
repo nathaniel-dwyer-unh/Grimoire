@@ -40,13 +40,42 @@ class Cards {
   }
 }
 
-class RetrieveCardDatabase extends StatelessWidget {
+class RetrieveCardDatabase extends StatefulWidget {
+  @override
+  _RetrieveCardDatabaseState createState() => _RetrieveCardDatabaseState();
+}
+
+class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
+  Future<Cards> futureCards;
+
+  @override
+  void initState() {
+    super.initState();
+    futureCards = fetchCards();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return OutlineButton(
-      onPressed: null,
-      child: Text('Retrieve/Load MTGJSON!'),
-      splashColor: Colors.purple,
-    );
+    return Column(children: [
+      OutlineButton(
+        onPressed: null,
+        child: Text('Retrieve/Load MTGJSON!'),
+        splashColor: Colors.purple,
+      ),
+      FutureBuilder<Cards>(
+        // should refactor this into a seperate dart file
+        future: futureCards,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Text(snapshot.data.title);
+          } else if (snapshot.hasError) {
+            return Text("${snapshot.error}");
+          }
+
+          // By default, show a loading spinner.
+          return CircularProgressIndicator();
+        },
+      )
+    ]);
   }
 }

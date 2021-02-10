@@ -15,14 +15,6 @@ class GrimoireApp extends StatefulWidget {
 }
 
 class _GrimoireAppState extends State<GrimoireApp> {
-  Future<Cards> futureCards;
-
-  @override
-  void initState() {
-    super.initState();
-    futureCards = fetchCards();
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,20 +27,6 @@ class _GrimoireAppState extends State<GrimoireApp> {
             children: [
               SearchCardDatabase(),
               RetrieveCardDatabase(),
-              FutureBuilder<Cards>(
-                // should refactor this into a seperate dart file
-                future: futureCards,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data.title);
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  }
-
-                  // By default, show a loading spinner.
-                  return CircularProgressIndicator();
-                },
-              )
             ],
           )),
       theme: ThemeData(primaryColor: Colors.purple),
