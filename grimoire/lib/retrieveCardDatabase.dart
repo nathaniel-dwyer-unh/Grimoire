@@ -24,19 +24,43 @@ Future<Cards> fetchCards() async {
 }
 
 class Cards {
-  // final int userId;
-  // final int id;
+  final String cardName;
+  final String layout;
+  final double convertedManaCost;
+  final List<dynamic> colorIdentity;
+  final String type;
+  final List<dynamic> types;
+  final List<dynamic> supertypes;
+  final List<dynamic> subtypes;
   final String rulesText;
+  final List<dynamic> rulings;
 
-  Cards({this.rulesText});
+  Cards(
+      {this.cardName,
+      this.layout,
+      this.convertedManaCost,
+      this.colorIdentity,
+      this.type,
+      this.types,
+      this.supertypes,
+      this.subtypes,
+      this.rulesText,
+      this.rulings});
 
   factory Cards.fromJson(Map<String, dynamic> json) {
     // this creates a json object that we can fill with card info
     return Cards(
-      // userId: json['userId'],
-      // id: json['id'],
-      rulesText: json['data']['Deadeye Navigator'][0]
-          ['text'], // this should return the rules text of the specified card
+      cardName: json['data']['Deadeye Navigator'][0]['name'],
+      layout: json['data']['Deadeye Navigator'][0]['layout'],
+      convertedManaCost: json['data']['Deadeye Navigator'][0]
+          ['convertedManaCost'],
+      colorIdentity: json['data']['Deadeye Navigator'][0]['colorIdentity'],
+      type: json['data']['Deadeye Navigator'][0]['type'],
+      types: json['data']['Deadeye Navigator'][0]['types'],
+      supertypes: json['data']['Deadeye Navigator'][0]['supertypes'],
+      subtypes: json['data']['Deadeye Navigator'][0]['subtypes'],
+      rulesText: json['data']['Deadeye Navigator'][0]['text'],
+      rulings: json['data']['Deadeye Navigator'][0]['rulings'],
     );
   }
 }
@@ -68,7 +92,8 @@ class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
         future: futureCards,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return Text(snapshot.data.rulesText);
+            return Text(
+                snapshot.data.type); // displays the chosen card attribute
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
