@@ -9,7 +9,7 @@ References:
 
 Future<Cards> fetchCards() async {
   final response =
-      await http.get(Uri.https('jsonplaceholder.typicode.com', 'albums/1'));
+      await http.get(Uri.https('mtgjson.com', 'api/v5/AtomicCards.json'));
 
   if (response.statusCode == 200) {
     // 200 is a successful status code
@@ -24,18 +24,19 @@ Future<Cards> fetchCards() async {
 }
 
 class Cards {
-  final int userId;
-  final int id;
-  final String title;
+  // final int userId;
+  // final int id;
+  final String rulesText;
 
-  Cards({this.userId, this.id, this.title});
+  Cards({this.rulesText});
 
   factory Cards.fromJson(Map<String, dynamic> json) {
     // this creates a json object that we can fill with card info
     return Cards(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'], // ['data'][cardName][0]['convertedManaCost']
+      // userId: json['userId'],
+      // id: json['id'],
+      rulesText: json['data']['Deadeye Navigator'][0]
+          ['text'], // this should return the rules text of the specified card
     );
   }
 }
@@ -67,7 +68,7 @@ class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
         future: futureCards,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return Text(snapshot.data.title);
+            return Text(snapshot.data.rulesText);
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
