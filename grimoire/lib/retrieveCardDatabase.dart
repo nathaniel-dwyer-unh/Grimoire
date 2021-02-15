@@ -93,11 +93,10 @@ class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Text(
-                snapshot.data.type); // displays the chosen card attribute
+                snapshot.data.rulesText); // displays the chosen card attribute
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
-
           // By default, show a loading spinner.
           return CircularProgressIndicator();
         },
