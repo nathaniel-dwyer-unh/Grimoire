@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "11784295320",
+    "project_id": "grimoire-backend",
+    "storage_bucket": "grimoire-backend.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11784295320:android:8d83d6cf5794dec8cf91ed",
+        "android_client_info": {
+          "package_name": "com.example.grimoire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "11784295320-emn01o9126nr8mgmj7h8l049cja1g0ib.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZhn3xfzH8v4vmLUv-s4Dm5H9R8o5Vmrw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "11784295320-emn01o9126nr8mgmj7h8l049cja1g0ib.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
