@@ -41,7 +41,10 @@ class _GrimoireAppState extends State<GrimoireApp> {
   }
 
   void updateFirebaseData() {
-    databaseReference.child('UserName').update({'description': 'User'});
+    databaseReference
+        .child('UserName')
+        .child('sub')
+        .update({'description': 'User'});
   }
 
   void deleteFirebaseData() {
