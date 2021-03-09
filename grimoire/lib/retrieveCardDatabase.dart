@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:convert';
 
@@ -69,27 +68,51 @@ class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
       // we take the response and convert it into a Map object
       final cardDatabase = jsonDecode(response.body) as Map;
       // then we iterate through the map to import it into the FirebaseDB
-      for (final name in cardDatabase['data'].keys) {
-        final cardName = cardDatabase['data'][name][0]['name'];
-        print(cardName);
+      int i = 0;
+      String cleanedCardName;
+      for (String cardName in cardDatabase['data'].keys) {
+        if (cardName.contains(new RegExp(r'([\/.#$\[\]])'))) {
+          cleanedCardName = cardName.replaceAll(RegExp(r'([\/.#$\[\]])'),
+              '-'); // the replaceAll() method here is so that we can strip special characters from the card name so Frebase will accept it as a legal key
+        } else {
+          cleanedCardName = cardName;
+        }
+        print(i.toString() + ': ' + cleanedCardName);
         Map<String, dynamic> cardAttributes = {
-          name: {
-            'name': cardDatabase['data'][name][0]['name'],
-            'layout': cardDatabase['data'][name][0]['layout'],
-            'convertedManaCost': cardDatabase['data'][name][0]
+          cleanedCardName: {
+            'name': cardDatabase['data'][cardName][0]['name'],
+            'layout': cardDatabase['data'][cardName][0]['layout'],
+            'convertedManaCost': cardDatabase['data'][cardName][0]
                 ['convertedManaCost'],
-            'colorIdentity': cardDatabase['data'][name][0]['colorIdentity'],
-            'type': cardDatabase['data'][name][0]['type'],
-            'types': cardDatabase['data'][name][0]['types'],
-            'supertypes': cardDatabase['data'][name][0]['supertypes'],
-            'subtypes': cardDatabase['data'][name][0]['subtypes'],
-            'rulings': cardDatabase['data'][name][0]['rulings']
+            'colorIdentity': cardDatabase['data'][cardName][0]['colorIdentity'],
+            'type': cardDatabase['data'][cardName][0]['type'],
+            'types': cardDatabase['data'][cardName][0]['types'],
+            'supertypes': cardDatabase['data'][cardName][0]['supertypes'],
+            'subtypes': cardDatabase['data'][cardName][0]['subtypes'],
+            'rulings': cardDatabase['data'][cardName][0]['rulings']
           }
         };
         databaseReference
             .child('CardDatabase')
             .child('data')
             .update(cardAttributes);
+        // since card rules text isn't a required attibute, we will test if each  card has rulestext
+        // if it does, we add it to the FirebaseDB
+        // if it doesn't we add a placeholder value
+        if (cardDatabase['data'][cardName][0].containsKey('text')) {
+          databaseReference
+              .child('CardDatabase')
+              .child('data')
+              .child(cleanedCardName)
+              .update({'text': cardDatabase['data'][cardName][0]['text']});
+        } else {
+          databaseReference
+              .child('CardDatabase')
+              .child('data')
+              .child(cleanedCardName)
+              .update({'text': ''});
+        }
+        i++;
       }
       return Cards.fromJson(
           jsonDecode(response.body), 'Derevi, Empyrial Tactician');

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 // Code Inspiration taken from https://flutter.dev/docs/cookbook/forms/retrieve-input
 
@@ -9,6 +10,7 @@ class SearchCardDatabase extends StatefulWidget {
 
 class _SearchCardDatabaseState extends State<SearchCardDatabase> {
   final cardNameSearchController = TextEditingController();
+  final databaseReference = FirebaseDatabase.instance.reference();
 
   @override
   void dispose() {
@@ -35,7 +37,12 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
                 return AlertDialog(
                   // Retrieve the text the user has entered by using the
                   // TextEditingController.
-                  content: Text(cardNameSearchController.text),
+                  content: Text(databaseReference
+                      .child('CardDatabase')
+                      .child('data')
+                      .child(cardNameSearchController.text)
+                      .once()
+                      .toString()),
                 );
               },
             );

@@ -48,7 +48,7 @@ class _GrimoireAppState extends State<GrimoireApp> {
   }
 
   void deleteFirebaseData() {
-    databaseReference.child('UserName').remove();
+    databaseReference.child('CardDatabase').remove();
   }
 
   @override
