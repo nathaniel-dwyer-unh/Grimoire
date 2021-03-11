@@ -62,7 +62,7 @@ class _GrimoireAppState extends State<GrimoireApp> {
           body: Column(
             children: [
               SearchCardDatabase(),
-              RetrieveCardDatabase(),
+              //RetrieveCardDatabase(),
               OutlineButton(
                 onPressed: () => createFirebaseData(),
                 child: Text('Write to FirebaseDB!'),
