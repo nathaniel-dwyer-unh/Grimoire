@@ -14,7 +14,8 @@ import './retrieveCardDatabase.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase
+      .initializeApp(); // start the app by initializing our connection to the FirebaseDB
   runApp(GrimoireApp());
 }
 
@@ -26,62 +27,36 @@ class GrimoireApp extends StatefulWidget {
 }
 
 class _GrimoireAppState extends State<GrimoireApp> {
-  final databaseReference = FirebaseDatabase.instance.reference();
+  final DatabaseReference databaseReference =
+      FirebaseDatabase.instance.reference();
 
-  void createFirebaseData() {
+  // does deleteFirebaseData() need to be in a FutureBuilder?
+  // this might be able to be placed outside the Stateful class to avoid extra caching
+  void deleteCardDatabase() {
     databaseReference
-        .child("UserName")
-        .set({'name': 'Nathaniel Dwyer', 'description': 'Author'});
-  }
-
-  void readFirebaseData() {
-    databaseReference.once().then((DataSnapshot snapshot) {
-      print('Data : ${snapshot.value}'); // prints to console
-    });
-  }
-
-  void updateFirebaseData() {
-    databaseReference
-        .child('UserName')
-        .child('sub')
-        .update({'description': 'User'});
-  }
-
-  void deleteFirebaseData() {
-    databaseReference.child('CardDatabase').remove();
+        .child('CardDatabase')
+        .remove(); // deletes the data under the 'cardDatabase' key in FirebaseDB
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+          // AppBar is the banner displayed across the top of the phone screen
           appBar: AppBar(
             title: Text('Grimoire App'),
             centerTitle: true,
           ),
           body: Column(
             children: [
-              SearchCardDatabase(),
-              //RetrieveCardDatabase(),
+              SearchCardDatabase(), // inculdes textField, 'Search FirebaseDB!' button, and database searchQuery logic
+              //RetrieveCardDatabase(), // includes 'Load Card Data to FirebaseDB1' button and fetchCards() logic for loading data from MTGJSON to FirebaseDB
               OutlineButton(
-                onPressed: () => createFirebaseData(),
-                child: Text('Write to FirebaseDB!'),
-                splashColor: Colors.purple,
-              ),
-              OutlineButton(
-                onPressed: () => readFirebaseData(),
-                child: Text('Read From FirebaseDB!'),
-                splashColor: Colors.purple,
-              ),
-              OutlineButton(
-                onPressed: () => updateFirebaseData(),
-                child: Text('Update FirebaseDB!'),
-                splashColor: Colors.purple,
-              ),
-              OutlineButton(
-                onPressed: () => deleteFirebaseData(),
+                onPressed: () => deleteCardDatabase(),
+                /* takes a few minutes to actually take effect,
+                though actually full-rebooting the debugger seems to allow it to trigger MUCH faster... */
                 child: Text('Delete Data From FirebaseDB!'),
-                splashColor: Colors.purple,
+                splashColor: Colors.red,
               ),
             ],
           )),

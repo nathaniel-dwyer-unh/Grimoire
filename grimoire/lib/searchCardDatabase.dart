@@ -9,6 +9,8 @@ class SearchCardDatabase extends StatefulWidget {
 }
 
 class _SearchCardDatabaseState extends State<SearchCardDatabase> {
+  /* TextEditingController() allows us to obtain the string value entered into the textField, 
+  allowing us to use that string as a query on our FirebaseDB */
   final cardNameSearchController = TextEditingController();
   final databaseReference = FirebaseDatabase.instance.reference();
   String cardSearch;
@@ -20,54 +22,29 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
     super.dispose();
   }
 
-  // retrieveCardData() might need to be an await / async / Future method, since it is obtaining data from the FirebaseDB
-  // Widget retrieveCardData(String searchQuery) {
-  //   Map<dynamic, dynamic> cardData;
-  //   String cleanedSearchQuery;
-  //   if (searchQuery.contains(new RegExp(r'([\/.#$\[\]])'))) {
-  //     cleanedSearchQuery = searchQuery.replaceAll(RegExp(r'([\/.#$\[\]])'),
-  //         '-'); // the replaceAll() method here is so that we can match the same key pattern as the one we used when updating the FirebaseDB
-  //   } else {
-  //     cleanedSearchQuery = searchQuery;
-  //   }
-  //   databaseReference
-  //       .child('CardDatabase')
-  //       .child('data')
-  //       .child(cleanedSearchQuery)
-  //       .once()
-  //       .then((DataSnapshot snapshot) {
-  //     cardData = snapshot.value;
-  //     for (var key in cardData.keys) {
-  //       // print(key.toString() + ': ' + cardData[key].toString()); // returns card data to debug console...
-  //     }
-  //   });
-  //   print(cardData
-  //       .toString()); // cardData is null????? Might need to change this retrieveCardData() function to an await of Future due to our use of .then()
-  //   // could also consult this for direction: https://stackoverflow.com/questions/53916529/how-do-i-get-the-value-of-this-variable-outside-the-then-statement-in-fl
-  //   return Text(cardData.toString());
-  // }
-
+  /* retrieveCardData() is the logic that allows the user to enter a string value into our textField
+  and submit that string value as a query on our FirebaseDB (basically, it allows the user to 
+  search for cardData from FirebaseDB using a textField) */
   Future<String> retrieveCardData(String searchQuery) async {
     String cleanedSearchQuery;
+    /* in order to keep consistent with the keys generated from our fetchCard() method,
+    if that card name contains any special characters ('[', ']', '/', '\', '#', '$', and '.',
+    the kind that FirebaseDB doesn't play nice with) */
     if (searchQuery.contains(new RegExp(r'([\/.#$\[\]])'))) {
-      cleanedSearchQuery = searchQuery.replaceAll(RegExp(r'([\/.#$\[\]])'),
-          '-'); // the replaceAll() method here is so that we can match the same key pattern as the one we used when updating the FirebaseDB
+      // then we clean-up the card name by replacing all instances of those special characters with the dash character '-'
+      cleanedSearchQuery =
+          searchQuery.replaceAll(RegExp(r'([\/.#$\[\]])'), '-');
     } else {
+      // if that card name does not contain any special characters, leave it be
       cleanedSearchQuery = searchQuery;
     }
+    // query FirebaseDB using the user's searchQuery string
     final response = await databaseReference
         .child('CardDatabase')
         .child('data')
         .child(cleanedSearchQuery)
         .once();
-    // .then((DataSnapshot snapshot) {
-    //       for (var key in snapshot.value.keys) {
-    //         print(key.toString() +
-    //             ': ' +
-    //             snapshot.value[key]
-    //                 .toString()); // returns card data to debug console...
-    //       }
-    //     });
+    // return the info of the card the user searched
     return response.value.toString();
   }
 
@@ -83,6 +60,10 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
         ),
         OutlineButton(
           onPressed: () {
+            /* we use setState() so that when this button is pressed,
+            the app takes the current value in the textField and saves it
+            under the variable 'cardSearch', then rebuilds the app,
+            triggering our retrieveCardData() method and passing the new cardSearch value to it. */
             setState(() {
               cardSearch = cardNameSearchController.text;
             });
@@ -94,10 +75,11 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
           future: retrieveCardData(cardSearch),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Text('There was an error with retrieving card data');
+              return Text("${snapshot.error}");
             } else if (snapshot.hasData) {
               return Text(snapshot.data);
             } else {
+              // By default, show a loading spinner.
               return CircularProgressIndicator();
             }
           },

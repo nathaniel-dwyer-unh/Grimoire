@@ -8,6 +8,8 @@ References:
   - Fetching data via http: https://flutter.dev/docs/cookbook/networking/fetch-data 
 */
 
+// THIS CLASS IS CURRENTLY UNUSED!
+/*
 class Cards {
   final String cardName;
   final String layout;
@@ -47,7 +49,8 @@ class Cards {
       rulings: json['data'][cardName][0]['rulings'],
     );
   }
-}
+ } 
+ */
 
 class RetrieveCardDatabase extends StatefulWidget {
   @override
@@ -55,29 +58,35 @@ class RetrieveCardDatabase extends StatefulWidget {
 }
 
 class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
-  Future<Cards> futureCards;
   final databaseReference = FirebaseDatabase.instance.reference();
 
-  Future<Cards> fetchCards() async {
-    final response =
-        await http.get(Uri.https('mtgjson.com', 'api/v5/AtomicCards.json'));
-
+  // fetchCards() is the logic that loads card data from the MTGJSON online API to our FirebaseDB Realtime Database backend
+  Future<int> fetchCards() async {
+    FirebaseDatabase.instance.goOnline(); // connect to the FirebaseDB
+    final response = await http.get(Uri.https('mtgjson.com',
+        'api/v5/AtomicCards.json')); // grabs the data from the MTGJSON online API
     if (response.statusCode == 200) {
-      // 200 is a successful status code
-      // if the server did return a 200 OK response
-      // we take the response and convert it into a Map object
+      // 200 is a successful response status code
+      // we take the MTGJSON response data and convert it into a Map object
       final cardDatabase = jsonDecode(response.body) as Map;
       // then we iterate through the map to import it into the FirebaseDB
       int i = 0;
       String cleanedCardName;
+      // for each card in MTGJSON's AtomicCards.json
       for (String cardName in cardDatabase['data'].keys) {
+        /* if that card name contains any special characters ('[', ']', '/', '\', '#', '$', and '.', in this case;
+        the kind that FirebaseDB doesn't play nice with) */
         if (cardName.contains(new RegExp(r'([\/.#$\[\]])'))) {
-          cleanedCardName = cardName.replaceAll(RegExp(r'([\/.#$\[\]])'),
-              '-'); // the replaceAll() method here is so that we can strip special characters from the card name so Frebase will accept it as a legal key
+          // then we clean-up the card name by replacing all instances of those special characters with the dash character '-'
+          cleanedCardName = cardName.replaceAll(RegExp(r'([\/.#$\[\]])'), '-');
         } else {
+          // if that card name does not contain any special characters, leave it be
           cleanedCardName = cardName;
         }
+        // for debug purposes, we will print each of the card name keys we will use in the FirebaseDB
         print(i.toString() + ': ' + cleanedCardName);
+        /* in preperation for updating our FirebaseDB with each card's data, 
+        we create a new Map object for each card to store that card's attributes that we care about */
         Map<String, dynamic> cardAttributes = {
           cleanedCardName: {
             'name': cardDatabase['data'][cardName][0]['name'],
@@ -92,13 +101,15 @@ class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
             'rulings': cardDatabase['data'][cardName][0]['rulings']
           }
         };
+        /* now that we have all the data we care about for each card stored in a single Map object
+        we can update our FirebaseDB with that Map object */
         databaseReference
             .child('CardDatabase')
             .child('data')
             .update(cardAttributes);
-        // since card rules text isn't a required attibute, we will test if each  card has rulestext
-        // if it does, we add it to the FirebaseDB
-        // if it doesn't we add a placeholder value
+        /* since card rulestext isn't an attibute that all cards have, we will test if each card has rulestext
+        if it does, we add it to the FirebaseDB
+        if it doesn't, we add a placeholder value (an empty string in this case) */
         if (cardDatabase['data'][cardName][0].containsKey('text')) {
           databaseReference
               .child('CardDatabase')
@@ -114,19 +125,13 @@ class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
         }
         i++;
       }
-      return Cards.fromJson(
-          jsonDecode(response.body), 'Derevi, Empyrial Tactician');
+      FirebaseDatabase.instance.goOffline(); // disconnect to the FirebaseDB
+      return cardDatabase['data']
+          .length; // return the number of cards in the AtomicCards.json file that we loaded
     } else {
-      // If the server did not return a 200 OK response
-      // then throw an exception
+      // If the server did not return a 200 OK response, then throw an exception
       throw Exception('Failed to load card database');
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    futureCards = fetchCards();
   }
 
   @override
@@ -134,16 +139,16 @@ class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
     return Column(children: [
       OutlineButton(
         onPressed: null,
-        child: Text('Retrieve/Load MTGJSON!'),
+        child: Text('Load Card Data to FirebaseDB!'),
         splashColor: Colors.purple,
       ),
-      FutureBuilder<Cards>(
-        // should refactor this into a seperate dart file
-        future: futureCards,
+      FutureBuilder<int>(
+        future: fetchCards(), // takes a few minutes to actually take effect
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return Text(
-                snapshot.data.rulesText); // displays the chosen card attribute
+            return Text('FirebaseDB Successfully Updated ' +
+                snapshot.data.toString() +
+                ' Values!');
           } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
