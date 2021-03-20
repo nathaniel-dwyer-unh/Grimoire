@@ -361,6 +361,74 @@ Widget getCardSubtypes(Map<String, dynamic> cardDataResponse) {
   }
 }
 
+Widget getCardText(Map<String, dynamic> cardDataResponse) {
+  if (cardDataResponse['text'] == '') {
+    return new Padding(
+      padding: EdgeInsets.all(3),
+      child: Row(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(3),
+            child: Text(
+              'Text: ',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 20,
+                color: Colors.black.withOpacity(0.6),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(3),
+              child: Text(
+                'None',
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 20,
+                  color: Colors.black.withOpacity(0.6),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  } else {
+    return new Padding(
+      padding: EdgeInsets.only(top: 20),
+      child: Row(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(3),
+            child: Text(
+              'Text: ',
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: 20,
+                color: Colors.black.withOpacity(0.6),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(3),
+              child: Text(
+                cardDataResponse['text'].toString(),
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 20,
+                  color: Colors.black.withOpacity(0.6),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _DisplayCardDataState extends State<DisplayCardData> {
   @override
   Widget build(BuildContext context) {
@@ -495,6 +563,7 @@ class _DisplayCardDataState extends State<DisplayCardData> {
           getCardTypes(widget.cardDataResponse),
           getCardSupertypes(widget.cardDataResponse),
           getCardSubtypes(widget.cardDataResponse),
+          getCardText(widget.cardDataResponse),
           Padding(
             padding: EdgeInsets.only(top: 20),
             child: Row(
