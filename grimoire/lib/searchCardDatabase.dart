@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import './displayCardData.dart';
 
 // Code Inspiration taken from https://flutter.dev/docs/cookbook/forms/retrieve-input
 
@@ -25,8 +26,9 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
   /* retrieveCardData() is the logic that allows the user to enter a string value into our textField
   and submit that string value as a query on our FirebaseDB (basically, it allows the user to 
   search for cardData from FirebaseDB using a textField) */
-  Future<String> retrieveCardData(String searchQuery) async {
+  Future<Map<String, dynamic>> retrieveCardData(String searchQuery) async {
     String cleanedSearchQuery;
+    Map<String, dynamic> cardDataResponse = {};
     /* in order to keep consistent with the keys generated from our fetchCard() method,
     if that card name contains any special characters ('[', ']', '/', '\', '#', '$', and '.',
     the kind that FirebaseDB doesn't play nice with) */
@@ -44,8 +46,12 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
         .child('data')
         .child(cleanedSearchQuery)
         .once();
+    // to make sure our Map object is typed correctly, we are going to re-construct a new map using our response
+    for (var key in response.value.keys) {
+      cardDataResponse[key.toString()] = response.value[key];
+    }
     // return the info of the card the user searched
-    return response.value.toString();
+    return cardDataResponse;
   }
 
   @override
@@ -71,19 +77,24 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
           child: Text('Search FirebaseDB!'),
           splashColor: Colors.purple,
         ),
-        FutureBuilder<String>(
-          future: retrieveCardData(cardSearch),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Text("${snapshot.error}");
-            } else if (snapshot.hasData) {
-              return Text(snapshot.data);
-            } else {
-              // By default, show a loading spinner.
-              return CircularProgressIndicator();
-            }
-          },
-        ),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: double.infinity),
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: retrieveCardData(cardSearch),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              } else if (snapshot.hasData) {
+                return DisplayCardData(
+                  cardDataResponse: snapshot.data,
+                ); // used to be just Text(snapshot.data.toString())
+              } else {
+                // By default, show a loading spinner.
+                return CircularProgressIndicator();
+              }
+            },
+          ),
+        )
       ],
     );
   }

@@ -42,24 +42,26 @@ class _GrimoireAppState extends State<GrimoireApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          // AppBar is the banner displayed across the top of the phone screen
-          appBar: AppBar(
-            title: Text('Grimoire App'),
-            centerTitle: true,
+        // AppBar is the banner displayed across the top of the phone screen
+        appBar: AppBar(
+          title: Text('Grimoire App'),
+          centerTitle: true,
+        ),
+        body: Container(
+          child: SingleChildScrollView(
+            child:
+                SearchCardDatabase(), // inculdes textField, 'Search FirebaseDB!' button, and database searchQuery logic
+            //RetrieveCardDatabase(), // includes 'Load Card Data to FirebaseDB1' button and fetchCards() logic for loading data from MTGJSON to FirebaseDB
+            // OutlineButton(
+            //   onPressed: () => deleteCardDatabase(),
+            //   /* takes a few minutes to actually take effect,
+            //   though actually full-rebooting the debugger seems to allow it to trigger MUCH faster... */
+            //   child: Text('Delete Data From FirebaseDB!'),
+            //   splashColor: Colors.red,
+            // ),
           ),
-          body: Column(
-            children: [
-              SearchCardDatabase(), // inculdes textField, 'Search FirebaseDB!' button, and database searchQuery logic
-              //RetrieveCardDatabase(), // includes 'Load Card Data to FirebaseDB1' button and fetchCards() logic for loading data from MTGJSON to FirebaseDB
-              OutlineButton(
-                onPressed: () => deleteCardDatabase(),
-                /* takes a few minutes to actually take effect,
-                though actually full-rebooting the debugger seems to allow it to trigger MUCH faster... */
-                child: Text('Delete Data From FirebaseDB!'),
-                splashColor: Colors.red,
-              ),
-            ],
-          )),
+        ),
+      ),
       theme: ThemeData(primaryColor: Colors.purple),
     );
   }
