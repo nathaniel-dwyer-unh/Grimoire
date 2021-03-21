@@ -137,10 +137,9 @@ class _RetrieveCardDatabaseState extends State<RetrieveCardDatabase> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      OutlineButton(
+      OutlinedButton(
         onPressed: null,
         child: Text('Load Card Data to FirebaseDB!'),
-        splashColor: Colors.purple,
       ),
       FutureBuilder<int>(
         future: fetchCards(), // takes a few minutes to actually take effect

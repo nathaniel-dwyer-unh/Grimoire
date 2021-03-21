@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
 import './displayCardData.dart';
+import './searchCardByImage.dart';
 
 // Code Inspiration taken from https://flutter.dev/docs/cookbook/forms/retrieve-input
 
@@ -64,18 +65,30 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
           decoration:
               InputDecoration(hintText: 'Enter a MTG Card Name to Search'),
         ),
-        OutlineButton(
-          onPressed: () {
-            /* we use setState() so that when this button is pressed,
+        Padding(
+          padding: EdgeInsets.all(3),
+          child: Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: OutlinedButton(
+                    onPressed: () {
+                      /* we use setState() so that when this button is pressed,
             the app takes the current value in the textField and saves it
             under the variable 'cardSearch', then rebuilds the app,
             triggering our retrieveCardData() method and passing the new cardSearch value to it. */
-            setState(() {
-              cardSearch = cardNameSearchController.text;
-            });
-          },
-          child: Text('Search FirebaseDB!'),
-          splashColor: Colors.purple,
+                      setState(() {
+                        cardSearch = cardNameSearchController.text;
+                      });
+                    },
+                    child: Text('Search for Card'),
+                  ),
+                ),
+              ),
+              SearchCardByImage(),
+            ],
+          ),
         ),
         ConstrainedBox(
           constraints: BoxConstraints(maxHeight: double.infinity),

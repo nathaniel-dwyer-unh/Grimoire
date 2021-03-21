@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:grimoire/searchCardDatabase.dart';
 import './searchCardDatabase.dart';
-import './retrieveCardDatabase.dart';
+// import './retrieveCardDatabase.dart';
 
 /*
   Firebase Setup Resources:

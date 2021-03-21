@@ -10,7 +10,7 @@ class DisplayCardData extends StatefulWidget {
 }
 
 Widget getCardRulings(Map<String, dynamic> cardDataResponse) {
-  List<Widget> listOfRulings = new List<Widget>();
+  List<Widget> listOfRulings = [];
   if (cardDataResponse['rulings'] == null) {
     return new Padding(
       padding: EdgeInsets.all(5),
