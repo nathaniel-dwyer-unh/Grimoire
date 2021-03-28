@@ -18,8 +18,8 @@ class _SearchCardByImageState extends State<SearchCardByImage> {
 
   // Select an image we want to use
   Future<File> getImage() async {
-    final pickedFile =
-        await picker.getImage(/* might need a CameraController here */);
+    final pickedFile = await picker.getImage(
+        source: ImageSource.camera /* might need a CameraController here */);
     if (pickedFile != null) {
       return File(pickedFile.path);
     } else {
