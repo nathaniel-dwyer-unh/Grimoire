@@ -19,7 +19,8 @@ class _SearchCardByImageState extends State<SearchCardByImage> {
   // Select an image we want to use
   Future<File> getImage() async {
     final pickedFile = await picker.getImage(
-        source: ImageSource.camera /* might need a CameraController here */);
+        // ImageSource.camera for phone camera and ImageSource.gallery for photo gallery
+        source: ImageSource.camera);
     if (pickedFile != null) {
       return File(pickedFile.path);
     } else {
@@ -36,25 +37,25 @@ class _SearchCardByImageState extends State<SearchCardByImage> {
           padding: EdgeInsets.all(3),
           child: OutlinedButton(
             onPressed: () {
-              getImage();
+              FutureBuilder<File>(
+                future: getImage(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text("${snapshot.error}");
+                  } else if (snapshot.hasData) {
+                    print(snapshot.data.toString());
+                    return Text(snapshot.data.toString());
+                  } else {
+                    // By default, show a loading spinner.
+                    return CircularProgressIndicator();
+                  }
+                },
+              );
             },
             child: Text('Search by Image'),
           ),
         ),
       ),
-      // child: FutureBuilder<File>(
-      //   future: getImage(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.hasError) {
-      //       return Text("${snapshot.error}");
-      //     } else if (snapshot.hasData) {
-      //       return Text(snapshot.data.toString());
-      //     } else {
-      //       // By default, show a loading spinner.
-      //       return CircularProgressIndicator();
-      //     }
-      //   },
-      // ),
     );
   }
 }

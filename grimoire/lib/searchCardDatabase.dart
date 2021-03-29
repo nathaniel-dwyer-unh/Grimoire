@@ -86,6 +86,12 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
                   ),
                 ),
               ),
+              /* might want to merge the contents of searchCardByImage.dart into this dart file, 
+              that we we can use the TextFieldController and the imagePicker/camera/photo gallery
+              /w text recognition as two different ways in which we can set the value of cardSearch 
+              using setState(() {}), allowing our FutureBuilder for retriveCardData(cardSearch) to 
+              just render the results once. We might also be able to drop cameraSceen.dart completely
+              for the time being */
               SearchCardByImage(),
             ],
           ),
