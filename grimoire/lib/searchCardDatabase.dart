@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_ml_vision/firebase_ml_vision.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import './displayCardData.dart';
-import './searchCardByImage.dart';
+// import './searchCardByImage.dart';
 
 // Code Inspiration taken from https://flutter.dev/docs/cookbook/forms/retrieve-input
 
@@ -16,6 +19,7 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
   final cardNameSearchController = TextEditingController();
   final databaseReference = FirebaseDatabase.instance.reference();
   String cardSearch;
+  final picker = ImagePicker();
 
   @override
   void dispose() {
@@ -55,6 +59,52 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
     return cardDataResponse;
   }
 
+  // Select an image we want to use
+  Future<File> getImage() async {
+    final imageFile = await picker.getImage(
+        // ImageSource.camera for phone camera and ImageSource.gallery for photo gallery
+        source: ImageSource.camera);
+    if (imageFile != null) {
+      print('Image Path: ' + imageFile.path.toString());
+      return File(imageFile.path);
+    } else {
+      print('No image selected.');
+      return null;
+    }
+  }
+
+  Future<String> retrieveTextFromImage(File imageFile) async {
+    // first, store the imageFile in a format that FirebaseML can use for text recognition
+    final visionImage = FirebaseVisionImage.fromFile(imageFile);
+    // initialize a textRecognizer
+    final textRecognizer = FirebaseVision.instance.textRecognizer();
+    // now we have FirebaseVision detect the text in our image
+    final VisionText visionText =
+        await textRecognizer.processImage(visionImage);
+
+    String alltext = visionText.text;
+    for (TextBlock block in visionText.blocks) {
+      final Rect boundingBox = block.boundingBox;
+      final List<Offset> cornerPoints = block.cornerPoints;
+      final String text = block.text;
+      final List<RecognizedLanguage> languages = block.recognizedLanguages;
+
+      // print('Bounding Box: ' + boundingBox.toString());
+      // print('Corner Points: ' + cornerPoints.toString());
+      // print('Text: ' + text.toString());
+      // print('Recognized Language: ' + languages.toString());
+
+      for (TextLine line in block.lines) {
+        // Same getters as TextBlock
+        for (TextElement element in line.elements) {
+          // Same getters as TextBlock
+        }
+      }
+    }
+    print('Look Here!: ' + alltext.substring(0, alltext.indexOf('\n')));
+    return alltext.substring(0, alltext.indexOf('\n'));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -92,7 +142,39 @@ class _SearchCardDatabaseState extends State<SearchCardDatabase> {
               using setState(() {}), allowing our FutureBuilder for retriveCardData(cardSearch) to 
               just render the results once. We might also be able to drop cameraSceen.dart completely
               for the time being */
-              SearchCardByImage(),
+              // SearchCardByImage(),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      cardSearch = await getImage().then(retrieveTextFromImage);
+                      setState(() {
+                        cardSearch = cardSearch;
+                      });
+                      // FutureBuilder<File>(
+                      //   future: getImage(),
+                      //   builder: (context, snapshot) {
+                      //     if (snapshot.hasError) {
+                      //       print("${snapshot.error}");
+                      //       return Text("${snapshot.error}");
+                      //     } else if (snapshot.hasData) {
+                      //       print('Executing Callback....');
+                      //       print("${snapshot.data}");
+                      //       retrieveTextFromImage(snapshot.data);
+                      //       return Text(snapshot.data.toString());
+                      //     } else {
+                      //       // By default, show a loading spinner.
+                      //       print('error?');
+                      //       return CircularProgressIndicator();
+                      //     }
+                      //   },
+                      // );
+                    },
+                    child: Text('Search by Image'),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
